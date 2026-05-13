@@ -19,6 +19,12 @@ function addLunchOption(name: string) {
   lunchOptions.value.push(option)
 }
 
+function deleteLunchOption(id: string) {
+  lunchOptions.value = lunchOptions.value.filter((option) => {
+    return option.id !== id
+  })
+}
+
 watch(
   lunchOptions,
   (value) => {
@@ -36,7 +42,7 @@ watch(
 
     <LunchForm @add="addLunchOption" />
 
-    <LunchList :options="lunchOptions" />
+    <LunchList :options="lunchOptions" @delete="deleteLunchOption" />
   </main>
 </template>
 
