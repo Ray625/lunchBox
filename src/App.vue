@@ -1,29 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import LunchList from './components/LunchList.vue'
 import LunchForm from './components/LunchForm.vue'
 import type { LunchOption } from './types/lunch'
 
-const lunchOptions = ref<LunchOption[]>([
-  {
-    id: '1',
-    name: '八方雲集',
-    createdAt: Date.now(),
-    weight: 1,
-  },
-  {
-    id: '2',
-    name: '韓式',
-    createdAt: Date.now(),
-    weight: 1,
-  },
-  {
-    id: '3',
-    name: '燒臘',
-    createdAt: Date.now(),
-    weight: 1,
-  },
-])
+import { saveLunchOptions, loadLunchOptions } from './utils/storage'
+
+const lunchOptions = ref<LunchOption[]>(loadLunchOptions())
 
 function addLunchOption(name: string) {
   const option: LunchOption = {
@@ -35,6 +18,16 @@ function addLunchOption(name: string) {
 
   lunchOptions.value.push(option)
 }
+
+watch(
+  lunchOptions,
+  (value) => {
+    saveLunchOptions(value)
+  },
+  {
+    deep: true,
+  },
+)
 </script>
 
 <template>
