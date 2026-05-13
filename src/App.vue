@@ -8,7 +8,6 @@ import type { LunchOption } from './types/lunch'
 import { saveLunchOptions, loadLunchOptions } from './utils/storage'
 
 const lunchOptions = ref<LunchOption[]>(loadLunchOptions())
-const pickedOption = ref<LunchOption | null>(null)
 
 function addLunchOption(name: string) {
   const option: LunchOption = {
@@ -25,10 +24,6 @@ function deleteLunchOption(id: string) {
   lunchOptions.value = lunchOptions.value.filter((option) => {
     return option.id !== id
   })
-}
-
-function handlePick(option: LunchOption) {
-  pickedOption.value = option
 }
 
 watch(
@@ -49,8 +44,7 @@ watch(
     <LunchForm @add="addLunchOption" />
 
     <LunchList :options="lunchOptions" @delete="deleteLunchOption" />
-    <LunchPicker :options="lunchOptions" @pick="handlePick" />
-    <p v-if="pickedOption">今天吃: {{ pickedOption.name }}</p>
+    <LunchPicker :options="lunchOptions" />
   </main>
 </template>
 
