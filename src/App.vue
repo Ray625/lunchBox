@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import LunchList from './components/LunchList.vue'
+import LunchForm from './components/LunchForm.vue'
 import type { LunchOption } from './types/lunch'
 
 const lunchOptions = ref<LunchOption[]>([
@@ -23,11 +24,24 @@ const lunchOptions = ref<LunchOption[]>([
     weight: 1,
   },
 ])
+
+function addLunchOption(name: string) {
+  const option: LunchOption = {
+    id: crypto.randomUUID(),
+    name,
+    createdAt: Date.now(),
+    weight: 1,
+  }
+
+  lunchOptions.value.push(option)
+}
 </script>
 
 <template>
   <main>
     <h1>午餐選擇器</h1>
+
+    <LunchForm @add="addLunchOption" />
 
     <LunchList :options="lunchOptions" />
   </main>
