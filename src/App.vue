@@ -2,11 +2,13 @@
 import { ref, watch } from 'vue'
 import LunchList from './components/LunchList.vue'
 import LunchForm from './components/LunchForm.vue'
+import LunchPicker from './components/LunchPicker.vue'
 import type { LunchOption } from './types/lunch'
 
 import { saveLunchOptions, loadLunchOptions } from './utils/storage'
 
 const lunchOptions = ref<LunchOption[]>(loadLunchOptions())
+const pickedOption = ref<LunchOption | null>(null)
 
 function addLunchOption(name: string) {
   const option: LunchOption = {
@@ -25,6 +27,10 @@ function deleteLunchOption(id: string) {
   })
 }
 
+function handlePick(option: LunchOption) {
+  pickedOption.value = option
+}
+
 watch(
   lunchOptions,
   (value) => {
@@ -38,11 +44,13 @@ watch(
 
 <template>
   <main>
-    <h1>午餐選擇器</h1>
+    <h2>哩賈霸未</h2>
 
     <LunchForm @add="addLunchOption" />
 
     <LunchList :options="lunchOptions" @delete="deleteLunchOption" />
+    <LunchPicker :options="lunchOptions" @pick="handlePick" />
+    <p v-if="pickedOption">今天吃: {{ pickedOption.name }}</p>
   </main>
 </template>
 
