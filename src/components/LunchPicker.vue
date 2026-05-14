@@ -19,7 +19,18 @@ const displayOption = ref<LunchOption | null>(null)
 const center = 100
 const radius = 90
 
-const colors = ['#f87171', '#fb923c', '#facc15', '#4ade80', '#60a5fa', '#a78bfa']
+const colors = [
+  '#f87171',
+  '#fb923c',
+  '#facc15',
+  '#4ade80',
+  '#2dd4bf',
+  '#60a5fa',
+  '#818cf8',
+  '#a78bfa',
+  '#f472b6',
+  '#94a3b8',
+]
 
 function degToRad(deg: number) {
   return (deg * Math.PI) / 180
@@ -170,9 +181,10 @@ function startRoll() {
           text-anchor="middle"
           dominant-baseline="middle"
           fill="white"
-          font-size="10"
+          font-size="18"
+          font-weight="900"
         >
-          {{ option.name }}
+          {{ index + 1 }}
         </text>
         <circle
           v-if="props.options.length === 0"

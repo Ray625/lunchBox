@@ -11,7 +11,8 @@ const emit = defineEmits<{
 </script>
 <template>
   <ul v-if="options.length > 0" class="lunch-list">
-    <li v-for="option in options" :key="option.id">
+    <li v-for="(option, index) in options" :key="option.id">
+      <span class="option-index">{{ index + 1 }}</span>
       <span>{{ option.name }}</span>
       <button type="button" :aria-label="`刪除 ${option.name}`" @click="emit('delete', option.id)">
         ×
@@ -41,6 +42,21 @@ li {
   padding: 5px 6px 5px 14px;
   background: #f9fafb;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.option-index {
+  display: grid;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  border-radius: 999px;
+  color: white;
+  background: #f97316;
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+  place-items: center;
 }
 
 span {
