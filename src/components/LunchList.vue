@@ -3,6 +3,7 @@ import type { LunchOption } from '@/types/lunch'
 
 defineProps<{
   options: LunchOption[]
+  selectedOptionId: string | null
 }>()
 
 const emit = defineEmits<{
@@ -11,7 +12,11 @@ const emit = defineEmits<{
 </script>
 <template>
   <ul v-if="options.length > 0" class="lunch-list">
-    <li v-for="(option, index) in options" :key="option.id">
+    <li
+      v-for="(option, index) in options"
+      :key="option.id"
+      :class="{ selected: option.id === selectedOptionId }"
+    >
       <span class="option-index">{{ index + 1 }}</span>
       <span>{{ option.name }}</span>
       <button type="button" :aria-label="`刪除 ${option.name}`" @click="emit('delete', option.id)">
@@ -42,6 +47,14 @@ li {
   padding: 5px 6px 5px 14px;
   background: #f9fafb;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+li.selected {
+  border-color: #f97316;
+  background: #fff7ed;
+  box-shadow:
+    0 0 0 3px rgba(249, 115, 22, 0.16),
+    0 8px 18px rgba(249, 115, 22, 0.16);
 }
 
 .option-index {

@@ -132,8 +132,11 @@ function spin() {
     (event) => {
       if (event.propertyName !== 'transform') return
 
-      displayOption.value = props.options[winnerIndex] ?? null
+      const winner = props.options[winnerIndex] ?? null
+
+      displayOption.value = winner
       isRolling.value = false
+      emit('pick', winner)
     },
     { once: true },
   )

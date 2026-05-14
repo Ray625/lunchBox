@@ -10,6 +10,7 @@ import { saveLunchOptions, loadLunchOptions } from './utils/storage'
 const MAX_OPTIONS = 10
 
 const lunchOptions = ref<LunchOption[]>(loadLunchOptions().slice(0, MAX_OPTIONS))
+const selectedOptionId = ref<string | null>(null)
 
 function addLunchOption(name: string) {
   if (lunchOptions.value.length >= MAX_OPTIONS) return
@@ -28,6 +29,14 @@ function deleteLunchOption(id: string) {
   lunchOptions.value = lunchOptions.value.filter((option) => {
     return option.id !== id
   })
+
+  if (selectedOptionId.value === id) {
+    selectedOptionId.value = null
+  }
+}
+
+function selectLunchOption(option: LunchOption | null) {
+  selectedOptionId.value = option?.id ?? null
 }
 
 watch(
@@ -55,8 +64,12 @@ watch(
         @add="addLunchOption"
       />
 
-      <LunchList :options="lunchOptions" @delete="deleteLunchOption" />
-      <LunchPicker :options="lunchOptions" />
+      <LunchList
+        :options="lunchOptions"
+        :selected-option-id="selectedOptionId"
+        @delete="deleteLunchOption"
+      />
+      <LunchPicker :options="lunchOptions" @pick="selectLunchOption" />
     </section>
   </main>
 </template>
