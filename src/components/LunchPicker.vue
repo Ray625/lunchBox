@@ -152,7 +152,7 @@ function startRoll() {
 }
 </script>
 <template>
-  <section>
+  <section class="picker">
     <div class="wheel-wrap">
       <svg viewBox="0 0 200 200" class="wheel">
         <path
@@ -174,6 +174,27 @@ function startRoll() {
         >
           {{ option.name }}
         </text>
+        <circle
+          v-if="props.options.length === 0"
+          cx="100"
+          cy="100"
+          r="88"
+          fill="#f3f4f6"
+          stroke="#e5e7eb"
+          stroke-width="2"
+        />
+        <text
+          v-if="props.options.length === 0"
+          x="100"
+          y="100"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          fill="#9ca3af"
+          font-size="10"
+          font-weight="700"
+        >
+          等待選項
+        </text>
       </svg>
       <div
         ref="pointerRef"
@@ -186,20 +207,34 @@ function startRoll() {
       </div>
       <div class="wheel-center"></div>
     </div>
-    <button type="button" @click="spin" :disabled="options.length === 0 || isRolling">
-      {{ isRolling ? '選擇中...' : '挑一個吧' }}
-    </button>
-    <p v-if="isRolling && displayOption">
-      {{ displayOption.name }}
-    </p>
-    <p v-if="displayOption && !isRolling">今天吃: {{ displayOption.name }}</p>
+    <div class="picker-actions">
+      <button type="button" @click="spin" :disabled="options.length === 0 || isRolling">
+        {{ isRolling ? '旋轉中...' : '挑一個吧' }}
+      </button>
+      <p class="result" :class="{ pending: isRolling }">
+        <template v-if="isRolling && displayOption">{{ displayOption.name }}</template>
+        <template v-else-if="displayOption">今天吃：{{ displayOption.name }}</template>
+        <template v-else>按下按鈕開始抽</template>
+      </p>
+    </div>
   </section>
 </template>
 <style scoped>
+.picker {
+  display: grid;
+  gap: 22px;
+  justify-items: center;
+}
+
 .wheel-wrap {
   position: relative;
-  width: 260px;
-  height: 260px;
+  width: min(100%, 340px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    inset 0 0 0 10px rgba(255, 255, 255, 0.72),
+    0 18px 40px rgba(15, 23, 42, 0.16);
 }
 
 .pointer-rotator {
@@ -215,15 +250,18 @@ function startRoll() {
 .pointer-triangle {
   width: 0;
   height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 32px solid #111;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 44px solid #111827;
+  filter: drop-shadow(0 3px 3px rgba(15, 23, 42, 0.24));
   transform: translate(-50%, -100%);
 }
 
 .wheel {
-  width: 260px;
-  height: 260px;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .wheel-center {
@@ -231,11 +269,66 @@ function startRoll() {
   left: 50%;
   top: 50%;
   z-index: 5;
-  width: 8px;
-  height: 8px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 0 0 2px #111;
+  box-shadow:
+    0 0 0 4px #111827,
+    0 6px 14px rgba(15, 23, 42, 0.26);
   transform: translate(-50%, -50%);
+}
+
+.picker-actions {
+  display: grid;
+  width: 100%;
+  gap: 12px;
+  justify-items: center;
+}
+
+button {
+  width: min(100%, 260px);
+  min-height: 54px;
+  border: 0;
+  border-radius: 16px;
+  color: white;
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  font-size: 1.08rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(239, 68, 68, 0.24);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+button:hover:not(:disabled) {
+  box-shadow: 0 18px 34px rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.result {
+  min-height: 44px;
+  margin: 0;
+  border-radius: 14px;
+  padding: 10px 16px;
+  color: #111827;
+  background: #fff7ed;
+  font-weight: 900;
+  text-align: center;
+}
+
+.result.pending {
+  color: #f97316;
 }
 </style>
