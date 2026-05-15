@@ -12,14 +12,14 @@ const MAX_OPTIONS = 10
 const lunchOptions = ref<LunchOption[]>(loadLunchOptions().slice(0, MAX_OPTIONS))
 const selectedOptionId = ref<string | null>(null)
 
-function addLunchOption(name: string) {
+function addLunchOption(payload: { name: string; weight: number }) {
   if (lunchOptions.value.length >= MAX_OPTIONS) return
 
   const option: LunchOption = {
     id: crypto.randomUUID(),
-    name,
+    name: payload.name,
+    weight: payload.weight,
     createdAt: Date.now(),
-    weight: 1,
   }
 
   lunchOptions.value.push(option)
@@ -98,7 +98,8 @@ watch(
 }
 
 :global(button),
-:global(input) {
+:global(input),
+:global(select) {
   font: inherit;
 }
 

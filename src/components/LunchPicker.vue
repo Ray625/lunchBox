@@ -46,11 +46,47 @@ function polarToCartesian(angle: number) {
   }
 }
 
+function getTotalWeight() {
+  return props.options.reduce((sum, option) => {
+    return sum + option.weight
+  }, 0)
+}
+
+function getSliceAngles(index: number) {
+  const totalWeight = getTotalWeight()
+
+  let startAngle = 0
+
+  for (let i = 0; i < index; i++) {
+    const option = props.options[i]
+    if (!option || totalWeight <= 0) continue
+
+    startAngle += (option.weight / totalWeight) * 360
+  }
+
+  const option = props.options[index]
+  if (!option || totalWeight <= 0) {
+    return {
+      startAngle,
+      endAngle: startAngle,
+      middleAngle: startAngle,
+      angle: 0,
+    }
+  }
+
+  const angle = (option.weight / totalWeight) * 360
+
+  return {
+    startAngle,
+    endAngle: startAngle + angle,
+    middleAngle: startAngle + angle / 2,
+    angle,
+  }
+}
+
 // 算出文字的x, y座標
 function getTextPosition(index: number) {
-  const sliceAngle = 360 / props.options.length
-  const startAngle = index * sliceAngle
-  const middleAngle = startAngle + sliceAngle / 2
+  const { middleAngle } = getSliceAngles(index)
 
   const textRadius = 65
 
@@ -65,14 +101,12 @@ function getTextPosition(index: number) {
 function createSlicePath(index: number) {
   if (props.options.length === 0) return ''
 
-  const sliceAngle = 360 / props.options.length
-  const startAngle = index * sliceAngle
-  const endAngle = startAngle + sliceAngle
+  const { startAngle, endAngle, angle } = getSliceAngles(index)
 
   const start = polarToCartesian(startAngle)
   const end = polarToCartesian(endAngle)
 
-  const largeArcFlag = sliceAngle > 180 ? 1 : 0
+  const largeArcFlag = angle > 180 ? 1 : 0
 
   return [
     `M ${center} ${center}`,
@@ -93,17 +127,35 @@ function pickRandomOption() {
 }
 
 function getMiddleAngle(index: number) {
-  const sliceAngle = 360 / props.options.length
-  return index * sliceAngle + sliceAngle / 2
+  return getSliceAngles(index)?.middleAngle
 }
 
 function getTextTransform(index: number) {
   const { x, y } = getTextPosition(index)
   const angle = getMiddleAngle(index)
 
+  if (!angle) return
   const readableAngle = angle > 90 && angle < 270 ? angle + 180 : angle
 
   return `rotate(${readableAngle}, ${x}, ${y})`
+}
+
+function pickWeightedIndex() {
+  const totalWeight = getTotalWeight()
+  let random = Math.random() * totalWeight
+
+  for (let i = 0; i < props.options.length; i++) {
+    const option = props.options[i]
+    if (!option) continue
+
+    random -= option.weight
+
+    if (random <= 0) {
+      return i
+    }
+  }
+
+  return props.options.length - 1
 }
 
 function spin() {
@@ -112,18 +164,16 @@ function spin() {
   isRolling.value = true
   displayOption.value = null
 
-  const winnerIndex = Math.floor(Math.random() * props.options.length)
-  const sliceAngle = 360 / props.options.length
+  const winnerIndex = pickWeightedIndex()
+  const { startAngle, endAngle, angle } = getSliceAngles(winnerIndex)
 
-  const startAngle = winnerIndex * sliceAngle
-
-  const padding = sliceAngle * 0.08
-  const targetAngle = startAngle + padding + Math.random() * (sliceAngle - padding * 2)
+  const padding = angle * 0.02
+  const targetAngle = startAngle + padding + Math.random() * (endAngle - startAngle - padding * 2)
 
   const currentAngle = rotation.value % 360
   const diff = (targetAngle - currentAngle + 360) % 360
 
-  const fullSpins = 360 * (Math.floor(Math.random() * 3) + 1)
+  const fullSpins = 360 * (Math.floor(Math.random() * 2) + 2)
 
   rotation.value += fullSpins + diff
 
@@ -140,29 +190,6 @@ function spin() {
     },
     { once: true },
   )
-}
-
-function startRoll() {
-  if (props.options.length === 0 || isRolling.value) return
-
-  isRolling.value = true
-
-  let count = 0
-  const maxCount = 20
-
-  const timer = window.setInterval(() => {
-    displayOption.value = pickRandomOption()
-    count++
-
-    if (count >= maxCount) {
-      window.clearInterval(timer)
-
-      const finalOption = pickRandomOption()
-      displayOption.value = finalOption
-      isRolling.value = false
-      emit('pick', finalOption)
-    }
-  }, 80)
 }
 </script>
 <template>
@@ -259,7 +286,7 @@ function startRoll() {
   width: 0;
   height: 0;
   z-index: 3;
-  transition: transform 2s cubic-bezier(0.22, 1, 0.36, 1.05);
+  transition: transform 1.75s cubic-bezier(0.22, 1, 0.36, 1.05);
 }
 
 .pointer-triangle {

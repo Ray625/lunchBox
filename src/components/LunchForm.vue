@@ -7,10 +7,11 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  add: [name: string]
+  add: [payload: { name: string; weight: number }]
 }>()
 
 const name = ref('')
+const weight = ref(1)
 const message = ref('')
 
 const isFull = computed(() => props.optionCount >= props.maxOptions)
@@ -31,8 +32,12 @@ function handleSubmit() {
     return
   }
 
-  emit('add', value)
+  emit('add', {
+    name: value,
+    weight: weight.value,
+  })
   name.value = ''
+  weight.value = 1
   message.value = ''
 }
 </script>
@@ -46,6 +51,17 @@ function handleSubmit() {
         placeholder="輸入午餐選項"
         :aria-invalid="isFull && !!message"
       />
+      <div class="weight-field">
+        <label for="lunch-weight">機率</label>
+        <select id="lunch-weight" v-model.number="weight">
+          <option :value="0.5">x0.5</option>
+          <option :value="1">x1</option>
+          <option :value="2">x2</option>
+          <option :value="3">x3</option>
+          <option :value="4">x4</option>
+          <option :value="5">x5</option>
+        </select>
+      </div>
       <button type="submit">新增</button>
     </div>
     <p v-if="message" class="limit-message">{{ message }}</p>
@@ -59,11 +75,26 @@ function handleSubmit() {
 
 .field-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 10px;
 }
 
-input {
+.weight-field {
+  display: inline-grid;
+  grid-template-columns: auto 82px;
+  align-items: center;
+  gap: 6px;
+}
+
+label {
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+input,
+select {
   width: 100%;
   min-height: 48px;
   border: 1px solid #d1d5db;
@@ -77,11 +108,23 @@ input {
     box-shadow 0.2s ease;
 }
 
+select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, #6b7280 50%) right 15px center / 6px 6px no-repeat,
+    linear-gradient(135deg, #6b7280 50%, transparent 50%) right 10px center / 6px 6px no-repeat,
+    #ffffff;
+  cursor: pointer;
+  font-weight: 800;
+  padding-right: 28px;
+}
+
 input::placeholder {
   color: #9ca3af;
 }
 
-input:focus {
+input:focus,
+select:focus {
   border-color: #f97316;
   box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
 }
@@ -128,7 +171,32 @@ button:active {
 
 @media (max-width: 360px) {
   .field-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+  }
+
+  .weight-field {
+    grid-template-columns: auto 76px;
+    gap: 5px;
+  }
+
+  input,
+  select,
+  button {
+    min-height: 44px;
+  }
+
+  input {
+    padding: 0 12px;
+  }
+
+  select {
+    padding-left: 10px;
+    padding-right: 24px;
+  }
+
+  button {
+    padding: 0 14px;
   }
 }
 </style>

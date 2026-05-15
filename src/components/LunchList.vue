@@ -19,6 +19,7 @@ const emit = defineEmits<{
     >
       <span class="option-index">{{ index + 1 }}</span>
       <span>{{ option.name }}</span>
+      <span class="option-weight">x{{ option.weight }}</span>
       <button type="button" :aria-label="`刪除 ${option.name}`" @click="emit('delete', option.id)">
         ×
       </button>
@@ -81,12 +82,23 @@ span {
   white-space: nowrap;
 }
 
+.option-weight {
+  flex: 0 0 auto;
+  margin-left: 4px;
+  border-radius: 999px;
+  padding: 3px 7px;
+  color: #6b7280;
+  background: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
 button {
   display: grid;
   flex: 0 0 auto;
   width: 26px;
   height: 26px;
-  margin-left: 8px;
+  margin-left: 4px;
   border: 0;
   border-radius: 999px;
   padding: 0;
